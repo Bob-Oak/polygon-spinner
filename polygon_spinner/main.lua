@@ -34,13 +34,17 @@ function rotate_points(points, center, theta)
     for i=1, size(points), 2 do
         local x = points[i] - center
         local y = points[i+1] - center
-        table.insert(new_x, x*math.cos(theta) - y*math.sin(theta) + center)
+        local z = x*math.cos(theta) - y*math.sin(theta) + center
+        z = math.round(z, 0.01)
+        table.insert(new_x, z)
     end
     -- Iterate Y
     for i=2, size(points), 2 do 
         local x = points[i-1] - center
         local y = points[i] - center
-        table.insert(new_y, x*math.sin(theta) + y*math.cos(theta) + center)
+        local z = x*math.sin(theta) + y*math.cos(theta) + center
+        z = math.round(z,0.01)
+        table.insert(new_y, z)
     end
     return_table = {}
     for x,y in zip(new_x, new_y) do
@@ -56,17 +60,18 @@ function love.load()
     cent = 400
     i_care = 0
     radius = 100
-    points = generate_n_points(cent,radius, 4)
+    threesixty_rate = 1/10
+    points = generate_n_points(cent,radius, 8)
 end
 
 function love.update(dt)
-    i_care  = (i_care + 1)%360
+    i_care  = (i_care + threesixty_rate)%360
     points = rotate_points(points, cent, i_care)
 end
 
 
 function love.draw()
-    love.graphics.polygon("fill",points)
+    love.graphics.polygon("line",points)
 end
 -- -------- UTILS ------------------------------------
 
@@ -106,7 +111,14 @@ function dump(o)
     return cnt
 end
 
+function math.sign(v)
+	return (v >= 0 and 1) or -1
+end
 
+function math.round(v, bracket)
+	bracket = bracket or 1
+	return math.floor(v/bracket + math.sign(v) * 0.5) * bracket
+end
 
 
 
